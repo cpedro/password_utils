@@ -5,7 +5,7 @@ Python scripts to perform password related tasks.
 This single repository replaced older, separate repositories that are now
 deprecated, `pwned_password_search` and `generate_shadow`.
 
-# Generate Passphrase
+# generate_passphrase.py: Generate Passphrase
 
 Script that generates random passphrases of lengths given from command line
 arguments.
