@@ -102,7 +102,7 @@ def lookup_password(passwd):
 def parse_args(args):
     parser = argparse.ArgumentParser(description='Check if passwords have been '
         'comprised.')
-    parser.add_argument('passwords', nargs='*',
+    parser.add_argument('password', nargs='*',
         help='Password to lookup.')
 
     return parser.parse_args(args)
@@ -111,14 +111,14 @@ def main(args):
     status = 0
 
     args = parse_args(args)
-    if sys.stdin.isatty() and len(args.passwords) == 0:
+    if sys.stdin.isatty() and len(args.password) == 0:
         try:
             status = lookup_password(getpass.getpass('Password to check: '))
         # Catch Ctrl-D
         except EOFError as error:
             return status
     else:
-        for passwd in args.passwords or sys.stdin:
+        for passwd in args.password or sys.stdin:
             status = lookup_password(passwd)
 
     return status
@@ -131,3 +131,5 @@ def handler(signal_received, frame):
 if __name__ == '__main__':
     signal(SIGINT, handler)
     sys.exit(main(sys.argv[1:]))
+
+

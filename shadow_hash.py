@@ -56,7 +56,6 @@ For more information, please refer to <http://unlicense.org>
 import argparse
 import crypt
 import getpass
-import random
 import sys
 
 from signal import signal, SIGINT
@@ -91,7 +90,7 @@ def parse_args(args):
     parser = argparse.ArgumentParser(description='Generate Shadow Hashes.')
     parser.add_argument('-m', '--method', default='SHA512', choices=hashes,
         help='Hashing method to use, default is SHA512')
-    parser.add_argument('passwords', nargs='*',
+    parser.add_argument('password', nargs='*',
         help='Password to generate hashes for.')
 
     return parser.parse_args(args)
@@ -100,7 +99,7 @@ def main(args):
     status = 0
 
     args = parse_args(args)
-    if sys.stdin.isatty() and len(args.passwords) == 0:
+    if sys.stdin.isatty() and len(args.password) == 0:
         try:
             passwd1 = getpass.getpass('Enter password: ')
             passwd2 = getpass.getpass('Re-enter password: ')
@@ -114,7 +113,7 @@ def main(args):
             print('Passwords entered do not match.')
             status = 1
     else:
-        for passwd in args.passwords or sys.stdin:
+        for passwd in args.password or sys.stdin:
             status = print_shadow(passwd, args.method)
 
     return status
