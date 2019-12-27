@@ -68,6 +68,7 @@ hashes = {
     'MD5':    crypt.METHOD_MD5,
 }
 
+
 def print_shadow(passwd, method):
     status = 0
 
@@ -95,13 +96,17 @@ def parse_args(args):
 
     return parser.parse_args(args)
 
+
+def handler(signal_received, frame):
+    sys.exit(0)
+
+
 def main(args):
     status = 0
 
     args = parse_args(args)
     if sys.stdin.isatty() and len(args.password) == 0:
-        passwd1 = ''
-        passwd2 = None
+        passwd1, passwd2 = None, ''
 
         while passwd1 != passwd2:
             try:
@@ -120,10 +125,6 @@ def main(args):
             status = print_shadow(passwd, args.method)
 
     return status
-
-
-def handler(signal_received, frame):
-    sys.exit(0)
 
 
 if __name__ == '__main__':
