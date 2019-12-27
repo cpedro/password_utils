@@ -80,6 +80,7 @@ def pwned_api_lookup(passwd):
     count = next((int(count) for val, count in hashes if val == tail), 0)
     return sha1, count
 
+
 def lookup_password(passwd):
     status = 0
     passwd = passwd.strip()
@@ -99,6 +100,7 @@ def lookup_password(passwd):
 
     return status
 
+
 def parse_args(args):
     parser = argparse.ArgumentParser(description='Check if passwords have been '
         'comprised.')
@@ -106,6 +108,11 @@ def parse_args(args):
         help='Password to lookup.')
 
     return parser.parse_args(args)
+
+
+def handler(signal_received, frame):
+    sys.exit(0)
+
 
 def main(args):
     status = 0
@@ -122,10 +129,6 @@ def main(args):
             status = lookup_password(passwd)
 
     return status
-
-
-def handler(signal_received, frame):
-    sys.exit(0)
 
 
 if __name__ == '__main__':
