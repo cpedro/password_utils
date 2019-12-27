@@ -6,7 +6,7 @@ that can be inserted directly into the `/etc/shadow` file on a Linux or Unix
 system.
 
 Author: E. Chris Pedro
-Version: 2019-12-24
+Version: 2019-12-27
 
 Current supported hash methods (from most secure to least):
     * SHA512 (Default)
@@ -100,18 +100,21 @@ def main(args):
 
     args = parse_args(args)
     if sys.stdin.isatty() and len(args.password) == 0:
-        try:
-            passwd1 = getpass.getpass('Enter password: ')
-            passwd2 = getpass.getpass('Re-enter password: ')
-        # Catch Ctrl-D
-        except EOFError as error:
-            return status
+        passwd1 = ''
+        passwd2 = None
 
-        if passwd1 == passwd2:
-            status = print_shadow(passwd1, args.method)
-        else:
-            print('Passwords entered do not match.')
-            status = 1
+        while passwd1 != passwd2:
+            try:
+                passwd1 = getpass.getpass('Enter password: ')
+                passwd2 = getpass.getpass('Re-enter password: ')
+            # Catch Ctrl-D
+            except EOFError as error:
+                return status
+
+            if passwd1 != passwd2:
+                print('Passwords entered do not match. Try again.')
+
+        status = print_shadow(passwd1, args.method)
     else:
         for passwd in args.password or sys.stdin:
             status = print_shadow(passwd, args.method)
