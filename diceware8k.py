@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Source: http://world.std.com/%7Ereinhold/diceware8k.txt
 Diceware 8k Word List
@@ -5,7 +6,8 @@ Diceware 8k Word List
     2000-10-23
 """
 
-DICEWARE8K_WORDS = ["a",
+DICEWARE8K_WORDS = [
+    "a",
     "a&p",
     "a's",
     "a2",
@@ -8196,5 +8198,7 @@ DICEWARE8K_WORDS = ["a",
     "=",
     "?",
     "??",
-    "@"]
+    "@",
+]
+
 

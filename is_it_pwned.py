@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 File: is_it_pwned.py
 Description: Checks a password against the Have I Been Pwned database, and
@@ -102,10 +103,10 @@ def lookup_password(passwd):
 
 
 def parse_args(args):
-    parser = argparse.ArgumentParser(description='Check if passwords have been '
-        'comprised.')
+    parser = argparse.ArgumentParser(description='Check if passwords have been'
+                                                 ' comprised')
     parser.add_argument('password', nargs='*',
-        help='Password to lookup.')
+                        help='Password to lookup.')
 
     return parser.parse_args(args)
 
@@ -122,7 +123,7 @@ def main(args):
         try:
             status = lookup_password(getpass.getpass('Password to check: '))
         # Catch Ctrl-D
-        except EOFError as error:
+        except EOFError:
             return status
     else:
         for passwd in args.password or sys.stdin:

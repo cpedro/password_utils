@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 File: generate_passphrase.py
 Description: Generates random passphrases of lengths given from command line
@@ -58,9 +59,9 @@ def print_passphrase(length):
 
 
 def parse_args(args):
-    parser = argparse.ArgumentParser(description='Generate Secure Passphrases.')
+    parser = argparse.ArgumentParser(description='Generate Secure Passphrases')
     parser.add_argument('length', type=int, nargs='+',
-        help='Passphrase length, must be greater than 4')
+                        help='Passphrase length, must be greater than 4')
 
     return parser.parse_args(args)
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 File: shadow_hash.py
-Description: A simple python script that can be used to generate a password hash
-that can be inserted directly into the `/etc/shadow` file on a Linux or Unix
-system.
+Description: A simple python script that can be used to generate a password
+hash that can be inserted directly into the `/etc/shadow` file on a Linux or
+Unix system.
 
 Author: E. Chris Pedro
 Version: 2019-12-27
@@ -65,7 +66,7 @@ from signal import signal, SIGINT
 hashes = {
     'SHA512': crypt.METHOD_SHA512,
     'SHA256': crypt.METHOD_SHA256,
-    'MD5':    crypt.METHOD_MD5,
+    'MD5': crypt.METHOD_MD5,
 }
 
 
@@ -77,7 +78,7 @@ def print_shadow(passwd, method):
 
     try:
         print(crypt.crypt(passwd, crypt.mksalt(hashes[method.upper()])))
-    except KeyError as error:
+    except KeyError:
         print('Hash method {} not supported.'.format(method))
         status = 1
     except Exception as exception:
@@ -88,11 +89,11 @@ def print_shadow(passwd, method):
 
 
 def parse_args(args):
-    parser = argparse.ArgumentParser(description='Generate Shadow Hashes.')
+    parser = argparse.ArgumentParser(description='Generate Shadow Hashes')
     parser.add_argument('-m', '--method', default='SHA512', choices=hashes,
-        help='Hashing method to use, default is SHA512')
+                        help='Hashing method to use, default is SHA512')
     parser.add_argument('password', nargs='*',
-        help='Password to generate hashes for.')
+                        help='Password to generate hashes for.')
 
     return parser.parse_args(args)
 
@@ -113,7 +114,7 @@ def main(args):
                 passwd1 = getpass.getpass('Enter password: ')
                 passwd2 = getpass.getpass('Re-enter password: ')
             # Catch Ctrl-D
-            except EOFError as error:
+            except EOFError:
                 return status
 
             if passwd1 != passwd2:
