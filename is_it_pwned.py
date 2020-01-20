@@ -6,9 +6,6 @@ Description: Checks a password against the Have I Been Pwned database, and
   reports back on whether or not it has been listed.  For more info on the
   API docs, see https://haveibeenpwned.com/API/v2
 
-Author: E. Chris Pedro
-Version: 2019-12-24
-
 usage: is_it_pwned.py [-h] [passwords [passwords ...]]
 
 Generate Shadow Hashes.
@@ -19,9 +16,8 @@ positional arguments:
 optional arguments:
   -h, --help  show this help message and exit
 
-
-Some code taken from Mike Pound's script that does the same.  Mike's script
-can be found here: <https://github.com/mikepound/pwned-search>
+Author: E. Chris Pedro
+Created: 2019-12-24
 
 
 This is free and unencumbered software released into the public domain.
@@ -53,41 +49,19 @@ For more information, please refer to <http://unlicense.org>
 import argparse
 import sys
 import getpass
-import hashlib
 
+from passwd import pwned_passwords as pwned
 from signal import signal, SIGINT
-
-try:
-    import requests
-except ModuleNotFoundError:
-    print('run: "pip3 install requests"')
-    raise
-
-
-def pwned_api_lookup(passwd):
-    # Change if API endpoint changes.
-    api_url = 'https://api.pwnedpasswords.com/range/'
-
-    sha1 = hashlib.sha1(passwd.encode('utf-8')).hexdigest().upper()
-    head, tail = sha1[:5], sha1[5:]
-
-    url = api_url + format(head)
-    req = requests.get(url)
-    status_code = req.status_code
-    if status_code != 200:
-        raise RuntimeError('Error fetching "{}": {}'.format(url, status_code))
-
-    hashes = (line.split(':') for line in req.text.splitlines())
-    count = next((int(count) for val, count in hashes if val == tail), 0)
-    return sha1, count
 
 
 def lookup_password(passwd):
+    """Used API to lookup password and print result.
+    """
     status = 0
     passwd = passwd.strip()
 
     try:
-        sha1, count = pwned_api_lookup(passwd)
+        sha1, count = pwned.lookup(passwd)
         if count:
             msg = '{0} has been pwned {1} times (hash: {2})'
             print(msg.format(passwd, count, sha1))
@@ -103,6 +77,8 @@ def lookup_password(passwd):
 
 
 def parse_args(args):
+    """Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description='Check if passwords have been'
                                                  ' comprised')
     parser.add_argument('password', nargs='*',
@@ -112,10 +88,14 @@ def parse_args(args):
 
 
 def handler(signal_received, frame):
+    """Signal handler.
+    """
     sys.exit(0)
 
 
 def main(args):
+    """Main method.
+    """
     status = 0
 
     args = parse_args(args)

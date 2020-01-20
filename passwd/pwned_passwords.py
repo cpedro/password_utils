@@ -1,22 +1,11 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-File: generate_passphrase.py
-Description: Generates random passphrases of lengths given from command line
-arguments.
-
-usage: generate_passphrase.py [-h] length [length ...]
-
-Generate Secure Passphrases
-
-positional arguments:
-  length      Passphrase length, must be greater than 4
-
-optional arguments:
-  -h, --help  show this help message and exit
+File: pwned_password.py
+Description: Tasks related to API calls to pwnedpasswords.com. For more info on
+the API docs, see https://haveibeenpwned.com/API/v2
 
 Author: E. Chris Pedro
-Created: 2019-12-24
+Created: 2020-01-20
 
 
 This is free and unencumbered software released into the public domain.
@@ -45,33 +34,37 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org>
 """
 
-import argparse
-import sys
+import hashlib
 
-from passwd import passphrase
+try:
+    import requests
+except ModuleNotFoundError:
+    print('run: "pip3 install requests"')
+    raise
+
+""" Change if API endpoint changes. """
+API_URL = 'https://api.pwnedpasswords.com/range/'
 
 
-def parse_args(args):
-    """Parse command line arguments.
+def lookup(passwd):
+    """Perform API lookup to pwnedpasswords.com.
+    Returns the SHA1 hash of the password entered, and the number of times that
+    password was found in the database.  0 means it has not been pwned.
+
+    Some code taken from Mike Pound's script that does the same.  Mike's script
+    can be found here: <https://github.com/mikepound/pwned-search>
     """
-    parser = argparse.ArgumentParser(description='Generate Secure Passphrases')
-    parser.add_argument('length', type=int, nargs='+',
-                        help='Passphrase length, must be greater than 4')
+    sha1 = hashlib.sha1(passwd.encode('utf-8')).hexdigest().upper()
+    head, tail = sha1[:5], sha1[5:]
 
-    return parser.parse_args(args)
+    url = API_URL + format(head)
+    req = requests.get(url)
+    status_code = req.status_code
+    if status_code != 200:
+        raise RuntimeError('Error fetching "{}": {}'.format(url, status_code))
 
-
-def main(args):
-    """Main method.
-    """
-    args = parse_args(args)
-    for length in args.length:
-        print(passphrase.generate(length))
-
-    return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    hashes = (line.split(':') for line in req.text.splitlines())
+    count = next((int(count) for val, count in hashes if val == tail), 0)
+    return sha1, count
 
 

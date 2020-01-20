@@ -1,22 +1,10 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-File: generate_passphrase.py
-Description: Generates random passphrases of lengths given from command line
-arguments.
-
-usage: generate_passphrase.py [-h] length [length ...]
-
-Generate Secure Passphrases
-
-positional arguments:
-  length      Passphrase length, must be greater than 4
-
-optional arguments:
-  -h, --help  show this help message and exit
+File: passphrase.py
+Description: Tasks related to passphrases, such as generating one.
 
 Author: E. Chris Pedro
-Created: 2019-12-24
+Created: 2020-01-20
 
 
 This is free and unencumbered software released into the public domain.
@@ -45,33 +33,25 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org>
 """
 
-import argparse
-import sys
-
-from passwd import passphrase
+from passwd import diceware8k
+from random import SystemRandom
 
 
-def parse_args(args):
-    """Parse command line arguments.
+def generate(length):
+    """Generate passphrase of a given length. This code uses the Diceware 8K
+    word list downloaded from http://world.std.com/%7Ereinhold/diceware.html
     """
-    parser = argparse.ArgumentParser(description='Generate Secure Passphrases')
-    parser.add_argument('length', type=int, nargs='+',
-                        help='Passphrase length, must be greater than 4')
+    if length < 4:
+        raise ValueError('Passphrases should be 4 or more in length.')
+        return 1
 
-    return parser.parse_args(args)
+    passphrase = ''
+    gen = SystemRandom()
+    for i in range(length):
+        if i != 0:
+            passphrase += ' '
+        passphrase += '{}'.format(gen.choice(diceware8k.DICEWARE8K_WORDS))
 
-
-def main(args):
-    """Main method.
-    """
-    args = parse_args(args)
-    for length in args.length:
-        print(passphrase.generate(length))
-
-    return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    return passphrase
 
 

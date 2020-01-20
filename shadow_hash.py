@@ -6,14 +6,6 @@ Description: A simple python script that can be used to generate a password
 hash that can be inserted directly into the `/etc/shadow` file on a Linux or
 Unix system.
 
-Author: E. Chris Pedro
-Version: 2019-12-27
-
-Current supported hash methods (from most secure to least):
-    * SHA512 (Default)
-    * SHA256
-    * MD5
-
 usage: shadow_hash.py [-h] [-m {SHA512,SHA256,MD5}]
                       [passwords [passwords ...]]
 
@@ -26,6 +18,9 @@ optional arguments:
   -h, --help            show this help message and exit
   -m {SHA512,SHA256,MD5}, --method {SHA512,SHA256,MD5}
                         Hashing method to use, default is SHA512
+
+Author: E. Chris Pedro
+Created: 2019-12-27
 
 
 This is free and unencumbered software released into the public domain.
@@ -55,42 +50,19 @@ For more information, please refer to <http://unlicense.org>
 """
 
 import argparse
-import crypt
 import getpass
 import sys
 
+from passwd import shadow
 from signal import signal, SIGINT
 
 
-# Change this dictionary to change supported hash methods.
-hashes = {
-    'SHA512': crypt.METHOD_SHA512,
-    'SHA256': crypt.METHOD_SHA256,
-    'MD5': crypt.METHOD_MD5,
-}
-
-
-def print_shadow(passwd, method):
-    status = 0
-
-    global hashes
-    passwd = passwd.strip()
-
-    try:
-        print(crypt.crypt(passwd, crypt.mksalt(hashes[method.upper()])))
-    except KeyError:
-        print('Hash method {} not supported.'.format(method))
-        status = 1
-    except Exception as exception:
-        print(str(exception))
-        status = 1
-
-    return status
-
-
 def parse_args(args):
+    """Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description='Generate Shadow Hashes')
-    parser.add_argument('-m', '--method', default='SHA512', choices=hashes,
+    parser.add_argument('-m', '--method', default='SHA512',
+                        choices=shadow.HASH_METHODS,
                         help='Hashing method to use, default is SHA512')
     parser.add_argument('password', nargs='*',
                         help='Password to generate hashes for.')
@@ -99,12 +71,14 @@ def parse_args(args):
 
 
 def handler(signal_received, frame):
+    """Signal handler.
+    """
     sys.exit(0)
 
 
 def main(args):
-    status = 0
-
+    """Main method.
+    """
     args = parse_args(args)
     if sys.stdin.isatty() and len(args.password) == 0:
         passwd1, passwd2 = None, ''
@@ -115,17 +89,17 @@ def main(args):
                 passwd2 = getpass.getpass('Re-enter password: ')
             # Catch Ctrl-D
             except EOFError:
-                return status
+                return 0
 
             if passwd1 != passwd2:
                 print('Passwords entered do not match. Try again.')
 
-        status = print_shadow(passwd1, args.method)
+        print(shadow.generate_hash(passwd1, args.method))
     else:
         for passwd in args.password or sys.stdin:
-            status = print_shadow(passwd, args.method)
+            print(shadow.generate_hash(passwd, args.method))
 
-    return status
+    return 0
 
 
 if __name__ == '__main__':

@@ -1,22 +1,15 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-File: generate_passphrase.py
-Description: Generates random passphrases of lengths given from command line
-arguments.
+File: shadow.py
+Description: Tasks related to password shadow files.
 
-usage: generate_passphrase.py [-h] length [length ...]
-
-Generate Secure Passphrases
-
-positional arguments:
-  length      Passphrase length, must be greater than 4
-
-optional arguments:
-  -h, --help  show this help message and exit
+Current supported hash methods (from most secure to least):
+    * SHA512 (Default)
+    * SHA256
+    * MD5
 
 Author: E. Chris Pedro
-Created: 2019-12-24
+Created: 2020-01-20
 
 
 This is free and unencumbered software released into the public domain.
@@ -45,33 +38,27 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org>
 """
 
-import argparse
-import sys
+import crypt
 
-from passwd import passphrase
+"""Dictionary of supported hash methods.
+"""
+HASH_METHODS = {
+    'SHA512': crypt.METHOD_SHA512,
+    'SHA256': crypt.METHOD_SHA256,
+    'MD5': crypt.METHOD_MD5,
+}
 
 
-def parse_args(args):
-    """Parse command line arguments.
+def generate_hash(passwd, method):
+    """Hash a password and return the hash.
     """
-    parser = argparse.ArgumentParser(description='Generate Secure Passphrases')
-    parser.add_argument('length', type=int, nargs='+',
-                        help='Passphrase length, must be greater than 4')
+    passwd = passwd.strip()
 
-    return parser.parse_args(args)
-
-
-def main(args):
-    """Main method.
-    """
-    args = parse_args(args)
-    for length in args.length:
-        print(passphrase.generate(length))
-
-    return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main(sys.argv[1:]))
+    try:
+        return crypt.crypt(passwd, crypt.mksalt(HASH_METHODS[method.upper()]))
+    except KeyError:
+        raise ValueError('Hash method {} not supported.'.format(method))
+    except Exception as exception:
+        raise exception
 
 
