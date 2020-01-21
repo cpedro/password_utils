@@ -43,7 +43,6 @@ def generate(length):
     """
     if length < 4:
         raise ValueError('Passphrases should be 4 or more in length.')
-        return 1
 
     passphrase = ''
     gen = SystemRandom()
