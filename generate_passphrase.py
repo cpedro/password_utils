@@ -56,7 +56,7 @@ def parse_args(args):
     """
     parser = argparse.ArgumentParser(description='Generate Secure Passphrases')
     parser.add_argument('length', type=int, nargs='+',
-                        help='Passphrase length, must be greater than 4')
+                        help='Passphrase length, must be 4 or greater.')
 
     return parser.parse_args(args)
 
