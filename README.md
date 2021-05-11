@@ -21,10 +21,10 @@ good enough for cryptographic use.
 ```
 usage: generate_passphrase.py [-h] length [length ...]
 
-Generate Secure Passphrases.
+Generate Secure Passphrases
 
 positional arguments:
-  length      Passphrase length, must be greater than 4
+  length      Passphrase length, must be 4 or greater.
 
 optional arguments:
   -h, --help  show this help message and exit
