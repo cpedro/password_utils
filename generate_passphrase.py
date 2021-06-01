@@ -66,8 +66,10 @@ def main(args):
     """
     args = parse_args(args)
     for length in args.length:
-        print(passphrase.generate(length))
-
+        try:
+            print(passphrase.generate(length))
+        except ValueError as e:
+            print(e)
     return 0
 
 
